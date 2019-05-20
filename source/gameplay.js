@@ -22,6 +22,8 @@ App.Main = function(game){
 	this.STATE_GAMEOVER = 4;
 	
 	this.BARRIER_DISTANCE = 300;
+
+	this.STATUS_SCREEN_WIDTH = 300;
 }
 
 App.Main.prototype = {
@@ -58,6 +60,10 @@ App.Main.prototype = {
 
 		// set the gravity of the world
 		this.game.physics.arcade.gravity.y = 1300;
+
+
+		this.game.time.slowMotion = 1 / 5;
+		this.game.forceSingleUpdate = false;
 		
 		// create a new Genetic Algorithm with a population of 10 units which will be evolving by using 4 top units
 		this.GA = new GeneticAlgorithm(10, 4);
@@ -80,15 +86,14 @@ App.Main.prototype = {
 		this.TargetPoint.anchor.setTo(0.5);
 		
 		// create a scrolling Ground object
-		this.Ground = this.game.add.tileSprite(0, this.game.height-100, this.game.width-370, 100, 'imgGround');
+		this.Ground = this.game.add.tileSprite(0, this.game.height-100, this.game.width-this.STATUS_SCREEN_WIDTH, 100, 'imgGround');
 		this.Ground.autoScroll(-200, 0);
 		
 		// create a BitmapData image for drawing head-up display (HUD) on it
-		this.bmdStatus = this.game.make.bitmapData(370, this.game.height);
+		this.bmdStatus = this.game.make.bitmapData(this.STATUS_SCREEN_WIDTH, this.game.height);
 		this.bmdStatus.addToWorld(this.game.width - this.bmdStatus.width, 0);
 		
 		// create text objects displayed in the HUD header
-		new Text(this.game, 1047, 10, "In1  In2  Out", "right", "fnt_chars_black"); // Input 1 | Input 2 | Output
 		this.txtPopulationPrev = new Text(this.game, 1190, 10, "", "right", "fnt_chars_black"); // No. of the previous population
 		this.txtPopulationCurr = new Text(this.game, 1270, 10, "", "right", "fnt_chars_black"); // No. of the current population
 		
@@ -97,22 +102,22 @@ App.Main.prototype = {
 		this.txtStatusPrevRed = [];		// array of red text objects to show info of weak units from the previous population
 		this.txtStatusCurr = [];		// array of blue text objects to show info of all units from the current population
 		
-		for (var i=0; i<this.GA.max_units; i++){
-			var y = 46 + i*50;
+		for (var j=0; j<this.GA.max_units; j++){
+			var y = 46 + j*50;
 			
-			new Text(this.game, 1110, y, "Fitness:\nScore:", "right", "fnt_chars_black")
+			new Text(this.game, 1110, y, "Fitness:\nScore:", "right", "fnt_chars_black");
 			this.txtStatusPrevGreen.push(new Text(this.game, 1190, y, "", "right", "fnt_digits_green"));
 			this.txtStatusPrevRed.push(new Text(this.game, 1190, y, "", "right", "fnt_digits_red"));
 			this.txtStatusCurr.push(new Text(this.game, 1270, y, "", "right", "fnt_digits_blue"));
 		}
 		
 		// create a text object displayed in the HUD footer to show info of the best unit ever born
-		this.txtBestUnit = new Text(this.game, 1095, 580, "", "center", "fnt_chars_black");
+		this.txtBestUnit = new Text(this.game, this.game.width - this.bmdStatus.width + 150, 580, "", "center", "fnt_chars_black");
 		
 		// create buttons
-		this.btnRestart = this.game.add.button(920, 620, 'imgButtons', this.onRestartClick, this, 0, 0);
-		this.btnPause = this.game.add.button(1160, 620, 'imgButtons', this.onPauseClick, this, 1, 1);
-		this.btnLogo = this.game.add.button(910, 680, 'imgLogo', this.onMoreGamesClick, this);
+		this.btnRestart = this.game.add.button(this.game.width - this.bmdStatus.width + 10, 620, 'imgButtons', this.onRestartClick, this, 0, 0);
+		this.btnPause = this.game.add.button(this.game.width - this.bmdStatus.width + this.btnRestart.width + 50, 620, 'imgButtons', this.onPauseClick, this, 1, 1);
+
 		
 		// create game paused info
 		this.sprPause = this.game.add.sprite(455, 360, 'imgPause');
@@ -244,16 +249,16 @@ App.Main.prototype = {
 			this.bmdStatus.draw(bird, 25, y-25); // draw bird's image
 			this.bmdStatus.rect(0, y, this.bmdStatus.width, 2, "#888"); // draw line separator
 			
-			if (bird.alive){
-				var brain = this.GA.Population[bird.index].toJSON();
-				var scale = this.GA.SCALE_FACTOR*0.02;
-				
-				this.bmdStatus.rect(62, y, 9, -(50 - brain.neurons[0].activation/scale), "#000088"); // input 1
-				this.bmdStatus.rect(90, y, 9, brain.neurons[1].activation/scale, "#000088"); // input 2
-				
-				if (brain.neurons[brain.neurons.length-1].activation<0.5) this.bmdStatus.rect(118, y, 9, -20, "#880000"); // output: flap = no
-				else this.bmdStatus.rect(118, y, 9, -40, "#008800"); // output: flap = yes
-			}
+			// if (bird.alive){
+			// 	var brain = this.GA.Population[bird.index].toJSON();
+			// 	var scale = this.GA.SCALE_FACTOR*0.02;
+			//
+			// 	this.bmdStatus.rect(62, y, 9, -(50 - brain.neurons[0].activation/scale), "#000088"); // input 1
+			// 	this.bmdStatus.rect(90, y, 9, brain.neurons[1].activation/scale, "#000088"); // input 2
+			//
+			// 	if (brain.neurons[brain.neurons.length-1].activation<0.5) this.bmdStatus.rect(118, y, 9, -20, "#880000"); // output: flap = no
+			// 	else this.bmdStatus.rect(118, y, 9, -40, "#008800"); // output: flap = yes
+			// }
 			
 			// draw bird's fitness and score
 			this.txtStatusCurr[bird.index].setText(bird.fitness_curr.toFixed(2)+"\n" + bird.score_curr);
