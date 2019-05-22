@@ -36,7 +36,7 @@ App.Main.prototype = {
 		this.game.load.image('imgGround', 'assets/img_ground.png');
 		this.game.load.image('imgPause', 'assets/img_pause.png');
 		this.game.load.image('imgLogo', 'assets/img_logo.png');
-		
+
 		this.load.bitmapFont('fnt_chars_black', 'assets/fnt_chars_black.png', 'assets/fnt_chars_black.fnt');
 		this.load.bitmapFont('fnt_digits_blue', 'assets/fnt_digits_blue.png', 'assets/fnt_digits_blue.fnt');
 		this.load.bitmapFont('fnt_digits_green', 'assets/fnt_digits_green.png', 'assets/fnt_digits_green.fnt');
@@ -146,8 +146,7 @@ App.Main.prototype = {
 				this.txtPopulationCurr.text = "GEN "+(this.GA.iteration);
 				
 				this.txtBestUnit.text = 
-					"The best unit was born in generation "+(this.GA.best_population)+":"+
-					"\nFitness = "+this.GA.best_fitness.toFixed(2)+" / Score = " + this.GA.best_score;
+					"High score:" + this.GA.best_score;
 				
 				// reset score and distance
 				this.score = 0;
@@ -241,13 +240,13 @@ App.Main.prototype = {
 	
 	drawStatus : function(){
 		this.bmdStatus.fill(180, 180, 180); // clear bitmap data by filling it with a gray color
-		this.bmdStatus.rect(0, 0, this.bmdStatus.width, 35, "#8e8e8e"); // draw the HUD header rect
+		this.bmdStatus.rect(0, 0, this.bmdStatus.width, 35, "#4a4a4a"); // draw the HUD header rect
 			
 		this.BirdGroup.forEach(function(bird){
 			var y = 85 + bird.index*50;
 								
 			this.bmdStatus.draw(bird, 25, y-25); // draw bird's image
-			this.bmdStatus.rect(0, y, this.bmdStatus.width, 2, "#888"); // draw line separator
+			this.bmdStatus.rect(0, y, this.bmdStatus.width, 2, "#000000"); // draw line separator
 			
 			// if (bird.alive){
 			// 	var brain = this.GA.Population[bird.index].toJSON();
